@@ -49,20 +49,23 @@ def remove_accents(input_str):
 st.title("🌸 Instagram Orders Manager")
 with st.expander("📘 Hướng dẫn sử dụng", expanded=False):
     st.markdown("""
-    ** Để có thể thực hiện bạn cần thực hiện theo quy trình: 
-    B1: Tạo tin nhắn sẵn theo cầu trúc sẵn trên IG để khi tư vấn khách sẽ chốt với khách theo các thông tin sau (ảnh có thể không cần cho vì a chưa update kịp :)))
-        Tên 
-        IG: @hoa.kem
-        SĐT: 0987654321
-        Địa chỉ: 123 Lê Lợi, Quận 1
-        Ảnh mẫu: https://www.instagram.com/p/abc123/
-        Số lượng bó: 2
-        giá: 20294
-        Cọc: 9237049725
-        Note yêu cầu khách hàng: Giao buổi sáng, tránh gọi
-        Trạng thái:
-    B2: sau khi chốt đơn với khách theo cấu trúc kia thì coppy tin nhắn đó dán vào trong app
-    B3: Done nhé Phương bé :V
+    ** Để có thể thực hiện bạn cần thực hiện theo quy trình này nhé Bà Chủ giàu <3:**
+                
+    **B1: Tạo tin nhắn sẵn theo cầu trúc sẵn trên IG để khi tư vấn khách sẽ chốt với khách theo các thông tin sau (ảnh có thể không cần cho vì a chưa update kịp :)))**
+    - Tên 
+    - IG: @hoa.kem
+    - SĐT: 0987654321
+    - Địa chỉ: 123 Lê Lợi, Quận 1
+    - Ảnh mẫu: https://www.instagram.com/p/abc123/
+    - Số lượng bó: 2
+    - giá: 20294
+    - Cọc: 9237049725
+    - Note yêu cầu khách hàng: Giao buổi sáng, tránh gọi
+    - Trạng thái:
+                
+    **B2: sau khi chốt đơn với khách theo cấu trúc kia thì coppy tin nhắn đó dán vào trong app**
+                
+    **B3: Done nhé Phương bé :V**
                 
     **🌼 Cách nhập đơn hàng mới:**
     - Dán nội dung tin nhắn vào ô 📩
