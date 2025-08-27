@@ -3,67 +3,62 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime, time
+import unicodedata
 
-# 🌐 Thiết lập giao diện
-st.set_page_config(page_title="Nhập đơn hàng Instagram", layout="centered")
+st.set_page_config(page_title="Instagram Orders", layout="wide")
+
 st.markdown("""
     <style>
-        .main { padding: 1rem; }
-        .block-container { padding-top: 2rem; }
-        textarea { font-size: 16px; }
-        button[kind="primary"] {
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 10px;
-            padding: 0.75em 2em;
-            font-size: 16px;
+        textarea, input, select, .stTextInput>div>div>input {
+            font-size: 16px !important;
+            padding: 6px 8px !important;
+        }
+        [data-testid="column"] {
+            padding: 0.5rem;
+        }
+        .st-bd { border-radius: 12px; }
+        .stButton > button {
+            background-color: #4CAF50; color: white;
+            border-radius: 10px; padding: 0.5em 1.5em; font-size: 15px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# 🔑 Kết nối Google Sheets
 def connect_gsheet():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = Credentials.from_service_account_info(st.secrets["google_service_account"], scopes=scope)
     client = gspread.authorize(creds)
-    sheet = client.open("Instagram Orders").worksheet("Đơn Hàng")
-    return sheet
+    return client.open("Instagram Orders").worksheet("Đơn Hàng")
 
-# 📖 Đọc dữ liệu
 def read_orders(sheet):
-    data = sheet.get_all_records()
-    return pd.DataFrame(data)
+    return pd.DataFrame(sheet.get_all_records())
 
-# ➕ Ghi đơn mới
-def append_order(sheet, order_data):
-    sheet.append_row(order_data)
+def append_order(sheet, data):
+    sheet.append_row(data)
 
-# 🔄 Cập nhật toàn bộ sheet
-def update_sheet(sheet, dataframe):
+def update_sheet(sheet, df):
     sheet.clear()
-    sheet.append_row(dataframe.columns.tolist())
-    for row in dataframe.itertuples(index=False):
+    sheet.append_row(df.columns.tolist())
+    for row in df.itertuples(index=False):
         sheet.append_row(list(row))
 
-# 🧾 Giao diện nhập
-st.title("📦 Nhập đơn hàng Instagram")
-st.markdown("Dán tin nhắn tổng hợp nội dung từ Instagram vào ô bên dưới:")
+def remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return "".join([c for c in nfkd_form if not unicodedata.combining(c)]).lower()
 
-input_text = st.text_area("📩 Tin nhắn đơn hàng", height=220)
-giao_ngay = st.date_input("📅 Ngày giao hàng")
-giao_gio = st.time_input("⏰ Giờ giao hàng", value=time(9, 0))
+st.title("🌸 Instagram Orders Manager")
+with st.expander("➕ Nhập đơn mới", expanded=True):
+    input_text = st.text_area("📩 Dán nội dung tin nhắn đơn hàng", height=200)
+    giao_ngay = st.date_input("📅 Ngày giao hàng")
+    giao_gio = st.time_input("⏰ Giờ giao", value=time(9, 0))
+    trang_thai = st.selectbox("📦 Trạng thái", ["Chưa giao", "Đã giao"])
 
-# 👉 Ghi dữ liệu
-if st.button("✅ Ghi vào Google Sheets"):
-    if not input_text.strip():
-        st.warning("⚠️ Vui lòng nhập nội dung đơn hàng!")
-    else:
-        try:
-            lines = input_text.strip().split("\n")
-            if len(lines) < 6:
-                st.error("❌ Thiếu dòng trong tin nhắn. Đơn hàng cần ít nhất 6 dòng.")
-            else:
-                sheet = connect_gsheet()
+    if st.button("✅ Ghi vào Google Sheet"):
+        if not input_text.strip():
+            st.warning("⚠️ Bạn chưa nhập nội dung đơn!")
+        else:
+            try:
+                lines = input_text.strip().split("\n")
                 data = {
                     "Thời gian đặt hàng": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
                     "Ngày giao hàng": giao_ngay.strftime("%d/%m/%Y"),
@@ -74,28 +69,123 @@ if st.button("✅ Ghi vào Google Sheets"):
                     "Địa chỉ": lines[3].split(":")[1].strip(),
                     "Ảnh mẫu": f'=IMAGE("{lines[4].split(":")[1].strip()}")',
                     "Số lượng bó": lines[5].split(":")[1].strip(),
-                    "Giá":lines[6].split(":")[1].strip(),
-                    "Cọc":lines[7].split(":")[1].strip(),
-                    "Note": lines[8].split(":")[1].strip() if len(lines) > 8 and ":" in lines[8] else ""
+                    "Giá": lines[6].split(":")[1].strip(),
+                    "Cọc": lines[7].split(":")[1].strip(),
+                    "Note": lines[8].split(":")[1].strip() if len(lines) > 8 else "",
+                    "Trạng thái": trang_thai
                 }
+                sheet = connect_gsheet()
                 append_order(sheet, list(data.values()))
-                st.success("✅ Đã ghi đơn hàng vào Google Sheets!")
-        except Exception as e:
-            st.error(f"❌ Lỗi: {e}")
+                st.success("✅ Đã ghi đơn vào Google Sheets!")
+            except Exception as e:
+                st.error(f"❌ Lỗi ghi dữ liệu: {e}")
 
-# 📋 Danh sách đơn đã lưu
-st.divider()
-st.subheader("📑 Danh sách đơn hàng đã lưu")
-
+st.subheader("📝 Chỉnh sửa & Lưu đơn hàng")
 try:
     sheet = connect_gsheet()
     df = read_orders(sheet)
 
-    edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
+    if "reset_trigger" not in st.session_state:
+        st.session_state.reset_trigger = False
 
-    if st.button("💾 Cập nhật đơn hàng"):
+    def reset_filters():
+        st.session_state.selected_date = ""
+        st.session_state.enable_time_range = False
+        st.session_state.from_time = time(0, 0)
+        st.session_state.to_time = time(23, 59)
+        st.session_state.status_filter = []
+        st.session_state.ig_filter = []
+        st.session_state.keyword_note = ""
+        st.session_state.keyword_address = ""
+        st.session_state.keyword_name = ""
+
+    with st.expander("🔍 Bộ lọc nâng cao (độc lập)", expanded=True):
+        if st.button("🔄 Reset tất cả bộ lọc"):
+            reset_filters()
+
+        selected_date = st.selectbox("📅 Chọn ngày giao hàng", options=[""] + sorted(df["Ngày giao hàng"].unique().tolist()), key="selected_date")
+        enable_time_range = st.checkbox("📍 Lọc theo giờ giao hàng", key="enable_time_range")
+        if enable_time_range:
+            from_time = st.time_input("Từ giờ", value=st.session_state.get("from_time", time(0, 0)), key="from_time")
+            to_time = st.time_input("Đến giờ", value=st.session_state.get("to_time", time(23, 59)), key="to_time")
+        else:
+            from_time, to_time = None, None
+
+        status_all = df["Trạng thái"].dropna().unique().tolist()
+        ig_all = df["Tên IG"].dropna().unique().tolist()
+        ten_all = df["Tên người nhận"].dropna().unique().tolist()
+
+        status_filter = st.multiselect("Trạng thái", status_all, key="status_filter")
+        ig_filter = st.multiselect("Tên IG", ig_all, key="ig_filter")
+
+        keyword_note = st.text_input("🔍 Tìm trong ghi chú (Note)", key="keyword_note")
+        keyword_address = st.text_input("🔍 Tìm trong địa chỉ", key="keyword_address")
+        keyword_name = st.selectbox("🔍 Tìm trong tên người nhận", options=[""] + sorted(ten_all), key="keyword_name")
+
+    filtered_df = df.copy()
+
+    if st.session_state.selected_date:
+        filtered_df = filtered_df[filtered_df["Ngày giao hàng"] == st.session_state.selected_date]
+
+    if enable_time_range:
+        filtered_df = filtered_df[
+            (filtered_df["Giờ giao hàng"] >= from_time.strftime("%H:%M")) &
+            (filtered_df["Giờ giao hàng"] <= to_time.strftime("%H:%M"))
+        ]
+
+    if st.session_state.status_filter:
+        filtered_df = filtered_df[filtered_df["Trạng thái"].isin(st.session_state.status_filter)]
+    if st.session_state.ig_filter:
+        filtered_df = filtered_df[filtered_df["Tên IG"].isin(st.session_state.ig_filter)]
+
+    if st.session_state.keyword_note:
+        filtered_df = filtered_df[filtered_df["Note"].str.contains(st.session_state.keyword_note, case=False, na=False)]
+    if st.session_state.keyword_address:
+        filtered_df = filtered_df[filtered_df["Địa chỉ"].str.contains(st.session_state.keyword_address, case=False, na=False)]
+    if st.session_state.keyword_name:
+        keyword_no_accent = remove_accents(st.session_state.keyword_name)
+        filtered_df = filtered_df[
+            filtered_df["Tên người nhận"].apply(lambda x: keyword_no_accent in remove_accents(x))
+        ]
+
+    def add_colored_status(row):
+        if row == "Đã giao":
+            return "🟢 Đã giao"
+        elif row == "Chưa giao":
+            return "🔴 Chưa giao"
+        else:
+            return row
+
+    df_display = filtered_df.copy()
+    df_display["Trạng thái"] = df_display["Trạng thái"].apply(add_colored_status)
+
+    st.markdown("### 📂 Danh sách sau khi lọc (không được ghi lại)")
+    st.dataframe(df_display, use_container_width=True)
+
+    st.markdown("### 📝 Chỉnh sửa toàn bộ đơn (ghi lại tất cả)")
+    df["Trạng thái"] = df["Trạng thái"].apply(add_colored_status)
+
+    edited_df = st.data_editor(
+        df,
+        use_container_width=True,
+        num_rows="dynamic",
+        column_config={
+            "Trạng thái": st.column_config.SelectboxColumn(
+                "Trạng thái",
+                options=["🟢 Đã giao", "🔴 Chưa giao"],
+                required=True
+            )
+        }
+    )
+
+    edited_df["Trạng thái"] = edited_df["Trạng thái"].replace({
+        "🟢 Đã giao": "Đã giao",
+        "🔴 Chưa giao": "Chưa giao"
+    })
+
+    if st.button("📏 Cập nhật thay đổi vào Google Sheets"):
         update_sheet(sheet, edited_df)
-        st.success("✅ Cập nhật Google Sheets thành công!")
+        st.success("✅ Đã cập nhật thành công!")
 
 except Exception as e:
-    st.error(f"Không thể tải dữ liệu từ Google Sheet. Vui lòng kiểm tra cấu hình.\n\n{e}")
+    st.error(f"❌ Không thể tải Google Sheets: {e}")
