@@ -52,15 +52,16 @@ with st.expander("📘 Hướng dẫn sử dụng", expanded=False):
     ** Để có thể thực hiện bạn cần thực hiện theo quy trình này nhé Bà Chủ giàu <3:**
                 
     **B1: Tạo tin nhắn sẵn theo cầu trúc sẵn trên IG để khi tư vấn khách sẽ chốt với khách theo các thông tin sau (ảnh có thể không cần cho vì a chưa update kịp :)))**
-    - Tên IG: VD. @hoa.kem
+    - Tên IG 
+    - Link IG: @hoa.kem
     - Tên người nhận: 
     - SĐT: 0987654321
-    - Địa chỉ:
+    - Địa chỉ: 123 Lê Lợi, Quận 1
     - Ảnh mẫu: https://www.instagram.com/p/abc123/
-    - Số lượng bó: 
-    - giá:
-    - Cọc:
-    - Note yêu cầu khách hàng:
+    - Số lượng bó: 2
+    - giá: 20294
+    - Cọc: 9237049725
+    - Note yêu cầu khách hàng: Giao buổi sáng, tránh gọi
     - Trạng thái:
                 
     **B2: sau khi chốt đơn với khách theo cấu trúc kia thì coppy tin nhắn đó dán vào trong app**
@@ -101,14 +102,15 @@ with st.expander("➕ Nhập đơn mới", expanded=True):
                     "Ngày giao hàng": giao_ngay.strftime("%d/%m/%Y"),
                     "Giờ giao hàng": giao_gio.strftime("%H:%M"),
                     "Tên IG": lines[0].split(":")[1].strip() if "Tên IG" in lines[0] else "",
-                    "Tên người nhận": lines[1].split(":")[1].strip(),
-                    "SĐT": lines[2].split(":")[1].strip(),
-                    "Địa chỉ": lines[3].split(":")[1].strip(),
-                    "Ảnh mẫu": f'=IMAGE("{lines[4].split(":")[1].strip()}")',
-                    "Số lượng bó": lines[5].split(":")[1].strip(),
-                    "Giá": lines[6].split(":")[1].strip(),
-                    "Cọc": lines[7].split(":")[1].strip(),
-                    "Note": lines[8].split(":")[1].strip() if len(lines) > 8 else "",
+                    "Link IG": lines[1].split(":")[1].strip(),
+                    "Tên người nhận": lines[2].split(":")[1].strip(),
+                    "SĐT": lines[3].split(":")[1].strip(),
+                    "Địa chỉ": lines[4].split(":")[1].strip(),
+                    "Ảnh mẫu": f'=IMAGE("{lines[5].split(":")[1].strip()}")',
+                    "Số lượng bó": lines[6].split(":")[1].strip(),
+                    "Giá": lines[7].split(":")[1].strip(),
+                    "Cọc": lines[8].split(":")[1].strip(),
+                    "Note": lines[9].split(":")[1].strip() if len(lines) > 9 else "",
                     "Trạng thái": trang_thai
                 }
                 sheet = connect_gsheet()
@@ -226,4 +228,3 @@ try:
 
 except Exception as e:
     st.error(f"❌ Không thể tải Google Sheets: {e}")
-
