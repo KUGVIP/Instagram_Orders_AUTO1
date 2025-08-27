@@ -47,6 +47,40 @@ def remove_accents(input_str):
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)]).lower()
 
 st.title("🌸 Instagram Orders Manager")
+with st.expander("📘 Hướng dẫn sử dụng", expanded=False):
+    st.markdown("""
+    ** Để có thể thực hiện bạn cần thực hiện theo quy trình: 
+    B1: Tạo tin nhắn sẵn theo cầu trúc sẵn trên IG để khi tư vấn khách sẽ chốt với khách theo các thông tin sau (ảnh có thể không cần cho vì a chưa update kịp :)))
+        Tên 
+        IG: @hoa.kem
+        SĐT: 0987654321
+        Địa chỉ: 123 Lê Lợi, Quận 1
+        Ảnh mẫu: https://www.instagram.com/p/abc123/
+        Số lượng bó: 2
+        giá: 20294
+        Cọc: 9237049725
+        Note yêu cầu khách hàng: Giao buổi sáng, tránh gọi
+        Trạng thái:
+    B2: sau khi chốt đơn với khách theo cấu trúc kia thì coppy tin nhắn đó dán vào trong app
+    B3: Done nhé Phương bé :V
+                
+    **🌼 Cách nhập đơn hàng mới:**
+    - Dán nội dung tin nhắn vào ô 📩
+    - Chọn ngày giao, giờ giao, trạng thái
+    - Bấm ✅ *Ghi vào Google Sheet*
+
+    **🔍 Cách lọc đơn hàng:**
+    - Chọn ngày hoặc giờ giao nếu muốn
+    - Lọc theo trạng thái, IG, người nhận, địa chỉ, ghi chú...
+    - Bấm 🔄 *Reset bộ lọc* để xóa tất cả
+
+    **📝 Cách chỉnh sửa đơn hàng:**
+    - Chỉnh trực tiếp bảng ở dưới
+    - Sau khi chỉnh, bấm 📏 *Cập nhật thay đổi vào Google Sheets*
+
+    > App hiển thị tốt trên cả điện thoại và máy tính.
+    """)
+
 with st.expander("➕ Nhập đơn mới", expanded=True):
     input_text = st.text_area("📩 Dán nội dung tin nhắn đơn hàng", height=200)
     giao_ngay = st.date_input("📅 Ngày giao hàng")
