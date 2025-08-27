@@ -52,15 +52,15 @@ with st.expander("📘 Hướng dẫn sử dụng", expanded=False):
     ** Để có thể thực hiện bạn cần thực hiện theo quy trình này nhé Bà Chủ giàu <3:**
                 
     **B1: Tạo tin nhắn sẵn theo cầu trúc sẵn trên IG để khi tư vấn khách sẽ chốt với khách theo các thông tin sau (ảnh có thể không cần cho vì a chưa update kịp :)))**
-    - Tên 
-    - IG: @hoa.kem
+    - Tên IG: VD. @hoa.kem
+    - Tên người nhận: 
     - SĐT: 0987654321
-    - Địa chỉ: 123 Lê Lợi, Quận 1
+    - Địa chỉ:
     - Ảnh mẫu: https://www.instagram.com/p/abc123/
-    - Số lượng bó: 2
-    - giá: 20294
-    - Cọc: 9237049725
-    - Note yêu cầu khách hàng: Giao buổi sáng, tránh gọi
+    - Số lượng bó: 
+    - giá:
+    - Cọc:
+    - Note yêu cầu khách hàng:
     - Trạng thái:
                 
     **B2: sau khi chốt đơn với khách theo cấu trúc kia thì coppy tin nhắn đó dán vào trong app**
@@ -226,3 +226,4 @@ try:
 
 except Exception as e:
     st.error(f"❌ Không thể tải Google Sheets: {e}")
+
