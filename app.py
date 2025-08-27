@@ -2,6 +2,28 @@ import streamlit as st
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
+
+import os
+import json
+import base64
+
+from dotenv import load_dotenv
+load_dotenv()
+
+def load_google_credentials():
+    encoded_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+    if not encoded_json:
+        raise ValueError("⚠️ Thiếu biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON")
+    decoded = base64.b64decode(encoded_json).decode("utf-8")
+    return json.loads(decoded)
+
+def connect_gsheet():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds_info = load_google_credentials()
+    creds = Credentials.from_service_account_info(creds_info, scopes=scope)
+    client = gspread.authorize(creds)
+    return client.open("Instagram Orders").worksheet("Đơn Hàng")
+
 from datetime import datetime, time
 import unicodedata
 
@@ -24,11 +46,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def connect_gsheet():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = Credentials.from_service_account_info(st.secrets["google_service_account"], scopes=scope)
-    client = gspread.authorize(creds)
-    return client.open("Instagram Orders").worksheet("Đơn Hàng")
+
 
 def read_orders(sheet):
     return pd.DataFrame(sheet.get_all_records())
